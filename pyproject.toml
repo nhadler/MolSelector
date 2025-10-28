@@ -17,6 +17,15 @@ package = true
 [project.scripts]
 molselector = "molselector.cli:main"
 
+[tool.setuptools.packages.find]
+include = ["molselector", "molselector.*"]
+
+[tool.setuptools.package-data]
+molselector = [
+    "static/**/*",
+    "templates/**/*",
+]
+
 [dependency-groups]
 dev = [
     "ruff>=0.14.2",
