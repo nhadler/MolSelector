@@ -35,13 +35,21 @@ uv sync
 
 ## Running the app
 
-Start a local development server with Uvicorn:
+Start a local development server with the built-in CLI:
 
 ```bash
-uvicorn molselector.app:app --reload
+molselector launch --reload
 ```
 
-Open your browser to `http://127.0.0.1:8000` and MolSelector will be ready.
+Open your browser to `http://127.0.0.1:8000` and MolSelector will be ready. The CLI exposes options such as `--host`, `--port`, and `--log-level`; use `molselector launch --help` to view them. You can still start the app manually with `uvicorn molselector.app:app` if you prefer.
+
+To preload a folder of molecules (skipping the manual selection step), supply the `--xyz-folder` option:
+
+```bash
+molselector launch --xyz-folder /path/to/molecules
+```
+
+The browser will automatically load that folder when the UI opens.
 
 ## Usage
 

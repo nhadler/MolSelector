@@ -1,9 +1,10 @@
 """Main FastAPI application for molecule selection."""
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -16,6 +17,7 @@ from starlette.concurrency import run_in_threadpool
 
 SUPPORTED_EXTENSIONS = {".xyz", ".mol", ".mol2"}
 RESULTS_FILENAME = "selection_results.csv"
+DEFAULT_FOLDER_ENV_VAR = "MOLSELECTOR_DEFAULT_FOLDER"
 
 
 class AppState:
@@ -53,6 +55,7 @@ async def index(request: Request) -> HTMLResponse:
         {
             "request": request,
             "supported_extensions": ", ".join(sorted(SUPPORTED_EXTENSIONS)),
+            "default_folder": _get_default_folder(),
         },
     )
 
@@ -143,7 +146,7 @@ async def record_decision(payload: DecisionRequest) -> Dict[str, object]:
 
     entry = {
         "decision": decision,
-        "timestamp": datetime.utcnow().isoformat(timespec="seconds"),
+        "timestamp": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     state.decisions[relative_key] = entry
     _persist_decisions(state.folder, state.decisions)
@@ -297,3 +300,21 @@ def _tkinter_folder_dialog() -> str:
 
 
 __all__ = ["app"]
+
+
+def _get_default_folder() -> Optional[str]:
+    """Return the default folder from the environment if it is a directory."""
+
+    raw_value = os.environ.get(DEFAULT_FOLDER_ENV_VAR)
+    if not raw_value:
+        return None
+
+    try:
+        path = Path(raw_value).expanduser().resolve()
+    except Exception:
+        return None
+
+    if not path.exists() or not path.is_dir():
+        return None
+
+    return str(path)

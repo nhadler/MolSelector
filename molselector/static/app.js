@@ -5,6 +5,8 @@ const state = {
   viewer: null,
 };
 
+const defaultFolder = window.MOLSELECTOR_DEFAULT_FOLDER;
+
 const folderForm = document.getElementById('folder-form');
 const folderInput = document.getElementById('folder-input');
 const folderStatus = document.getElementById('folder-status');
@@ -217,6 +219,11 @@ window.addEventListener('resize', () => {
 });
 
 initViewer();
+
+if (typeof defaultFolder === 'string' && defaultFolder.trim()) {
+  folderInput.value = defaultFolder;
+  void loadFolder(defaultFolder);
+}
 
 function handleKeydown(event) {
   if (!state.files.length) {
