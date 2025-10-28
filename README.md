@@ -35,10 +35,10 @@ uv sync
 
 ## Running the app
 
-Start a local development server with the built-in CLI:
+Start a local server with the built-in CLI:
 
 ```bash
-molselector launch --reload
+molselector launch
 ```
 
 Open your browser to `http://127.0.0.1:8000` and MolSelector will be ready. The CLI exposes options such as `--host`, `--port`, and `--log-level`; use `molselector launch --help` to view them. You can still start the app manually with `uvicorn molselector.app:app` if you prefer.
