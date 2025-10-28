@@ -1,10 +1,10 @@
 # MolSelector
 
+MolSelector is a lightweight web app for triaging molecular structures (`.xyz`, `.mol`, `.mol2`). Point the app at a folder of files, explore each molecule in an interactive 3D viewer powered by [3Dmol.js](https://3dmol.csb.pitt.edu/), and rapidly tag it as **accept** or **decline**. Decisions are written to `selection_results.csv` in the chosen folder so they can be versioned or analyzed later.
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/nhadler/MolSelector/refs/heads/main/img/example.png" alt="toc" width="80%">
 </p>
-
-MolSelector is a lightweight web app for triaging molecular structures (`.xyz`, `.mol`, `.mol2`). Point the app at a folder of files, explore each molecule in an interactive 3D viewer powered by [3Dmol.js](https://3dmol.csb.pitt.edu/), and rapidly tag it as **accept** or **decline**. Decisions are written to `selection_results.csv` in the chosen folder so they can be versioned or analyzed later.
 
 ## Features
 
