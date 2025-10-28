@@ -7,7 +7,6 @@ MolSelector is a lightweight web app for triaging molecular structures (`.xyz`, 
 - Fast folder loading with support for `.xyz`, `.mol`, and `.mol2` files (non-recursive)
 - Interactive 3D visualization using sticks and spheres with customizable styling
 - Accept, decline, and back actions with mouse or keyboard shortcuts
-- Native folder picker on macOS (AppleScript) and Tk-based picker on other platforms
 - Automatic CSV logging with timestamps so you can stop and resume reviews anytime
 
 ## Requirements
@@ -61,23 +60,6 @@ The CSV file (`selection_results.csv`) contains three columns:
 | `file` | Relative path to the molecule inside the selected folder |
 | `decision` | Either `accept` or `decline` |
 | `timestamp` | UTC timestamp recorded at the decision moment |
-
-## Native folder picker notes
-
-- **macOS**: Uses AppleScript (`osascript`). Ensure AppleScript is available (installed by default). If the picker fails, you can still paste a folder path manually.
-- **Linux / Windows**: Falls back to Python's Tkinter dialog. If Tk is missing, install the `python3-tk` package (Linux) or add Tk during Python installation (Windows).
-
-## Development
-
-Install the dev tooling and run static checks:
-
-```bash
-pip install -e .
-pip install ruff
-ruff check .
-```
-
-When contributing code, consider adding tests or manual verification steps that cover your changes (e.g., folder loading edge cases, CSV persistence, keyboard shortcuts).
 
 ## Contributing
 
