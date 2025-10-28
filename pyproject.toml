@@ -1,7 +1,7 @@
 [project]
 name = "molselector"
 version = "0.1.0"
-description = "Add your description here"
+description = "A web app to quickly triage molecule files."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
