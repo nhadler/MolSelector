@@ -17,20 +17,8 @@ MolSelector is a lightweight web app for triaging molecular structures (`.xyz`, 
 
 ## Installation
 
-Clone the repository and install the package in editable mode:
-
 ```bash
-git clone https://github.com/your-account/molselector.git
-cd molselector
-python -m venv .venv
-source .venv/bin/activate  # On Windows use .venv\Scripts\activate
-pip install -e .
-```
-
-If you use [uv](https://github.com/astral-sh/uv):
-
-```bash
-uv sync
+pip install molselector
 ```
 
 ## Running the app
