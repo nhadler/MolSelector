@@ -6,13 +6,6 @@ MolSelector is a lightweight web app for triaging molecular structures (`.xyz`, 
   <img src="https://raw.githubusercontent.com/nhadler/MolSelector/refs/heads/main/img/example.png" alt="toc" width="80%">
 </p>
 
-## Features
-
-- Fast folder loading with support for `.xyz`, `.mol`, and `.mol2` files (non-recursive)
-- Interactive 3D visualization using sticks and spheres with customizable styling
-- Accept, decline, and back actions with mouse or keyboard shortcuts
-- Automatic CSV logging with timestamps so you can stop and resume reviews anytime
-
 ## Requirements
 
 - Python 3.12+
@@ -40,14 +33,7 @@ To preload a folder of molecules (skipping the manual selection step), supply th
 molselector launch --xyz-folder /path/to/molecules
 ```
 
-The browser will automatically load that folder when the UI opens.
-
 ## Usage
-
-1. Enter an absolute path to a folder containing `.xyz`, `.mol`, or `.mol2` files, or click **Browse…** to pick a folder using the native dialog.
-2. MolSelector lists every supported file in the folder and loads the first unreviewed molecule in the embedded 3D viewer.
-3. Inspect the structure, then use **Accept**, **Decline**, or **Back** to record your judgment. Decisions are saved instantly to `selection_results.csv` in the same folder.
-4. Reloading the same folder restores previous decisions so you can resume where you left off.
 
 ### Keyboard shortcuts
 
@@ -64,10 +50,6 @@ The CSV file (`selection_results.csv`) contains three columns:
 | `file` | Relative path to the molecule inside the selected folder |
 | `decision` | Either `accept` or `decline` |
 | `timestamp` | UTC timestamp recorded at the decision moment |
-
-## Contributing
-
-Contributions are welcome! If you have ideas for improvements—batch actions, recursive search, alternate viewers—open an issue or submit a pull request describing the change.
 
 ## License
 
