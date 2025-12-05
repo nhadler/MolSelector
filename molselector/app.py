@@ -71,11 +71,13 @@ async def set_folder(payload: FolderRequest) -> Dict[str, object]:
     if not files:
         raise HTTPException(status_code=404, detail="No molecular files found in folder")
 
-    decisions = _load_decisions(folder_path)
+    decisions, results_file_present = _load_decisions(folder_path)
 
     state.folder = folder_path
     state.files = files
     state.decisions = decisions
+
+    declined_count = sum(1 for entry in decisions.values() if entry.get("decision") == "decline")
 
     response_files = [
         {
@@ -90,6 +92,8 @@ async def set_folder(payload: FolderRequest) -> Dict[str, object]:
         "folder": str(folder_path),
         "results_csv": str(folder_path / RESULTS_FILENAME),
         "files": response_files,
+        "has_results": results_file_present,
+        "declined_count": declined_count,
     }
 
 
@@ -183,25 +187,26 @@ def _resolve_in_folder(relative_path: str) -> Path:
     return candidate
 
 
-def _load_decisions(folder: Path) -> Dict[str, Dict[str, str]]:
+def _load_decisions(folder: Path) -> tuple[Dict[str, Dict[str, str]], bool]:
     """Load existing decisions from CSV if present."""
     csv_path = folder / RESULTS_FILENAME
-    if not csv_path.exists():
-        return {}
+    csv_exists = csv_path.exists()
+    if not csv_exists:
+        return {}, False
 
     decisions: Dict[str, Dict[str, str]] = {}
     try:
         with csv_path.open("r", newline="") as handle:
             rows = list(_read_csv(handle))
     except Exception:
-        return {}
+        return {}, csv_exists
 
     for row in rows:
         file_key = row.get("file")
         decision = row.get("decision")
         if file_key and decision in {"accept", "decline"}:
             decisions[file_key] = {"decision": decision, "timestamp": row.get("timestamp", "")}
-    return decisions
+    return decisions, csv_exists
 
 
 def _persist_decisions(folder: Path, decisions: Dict[str, Dict[str, str]]) -> None:

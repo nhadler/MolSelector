@@ -31,6 +31,15 @@
           <h2 id="file-name">&nbsp;</h2>
           <div class="progress" id="progress-bar">0 / 0</div>
         </div>
+        <div class="viewer-toolbar">
+          <div id="declined-filter" class="filter-toggle hidden">
+            <label for="declined-toggle" class="checkbox-label">
+              <input type="checkbox" id="declined-toggle" />
+              <span>Show declined only</span>
+            </label>
+            <span id="declined-count" class="pill"></span>
+          </div>
+        </div>
         <div id="viewer" class="viewer-canvas"></div>
         <div class="controls">
           <button id="back-btn" class="secondary" type="button">Back</button>
