@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 import sys
 from datetime import UTC, datetime
@@ -50,12 +51,15 @@ class DecisionRequest(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request) -> HTMLResponse:
     """Serve the main web application."""
+    picker_available, picker_reason = _folder_picker_available()
+
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
             "supported_extensions": ", ".join(sorted(SUPPORTED_EXTENSIONS)),
             "default_folder": _get_default_folder(),
+            "folder_picker": {"available": picker_available, "reason": picker_reason},
         },
     )
 
@@ -101,15 +105,27 @@ async def set_folder(payload: FolderRequest) -> Dict[str, object]:
 async def pick_folder() -> Dict[str, str]:
     """Open a native folder picker dialog and return the selected folder."""
 
+    available, reason = _folder_picker_available()
+    if not available:
+        raise HTTPException(status_code=503, detail=reason or "Folder picker is not available on this system")
+
     try:
         folder = await run_in_threadpool(_open_folder_dialog)
     except RuntimeError as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        raise HTTPException(status_code=503, detail=str(exc))
 
     if not folder:
         raise HTTPException(status_code=400, detail="No folder selected")
 
     return {"folder": folder}
+
+
+@app.get("/api/folder/picker/availability")
+async def folder_picker_availability() -> Dict[str, object]:
+    """Report whether the native folder picker can be used."""
+
+    available, reason = _folder_picker_available()
+    return {"available": available, "reason": reason}
 
 
 @app.get("/api/molecule")
@@ -234,8 +250,39 @@ def _csv_writer(handle, fieldnames):
     return csv.DictWriter(handle, fieldnames=fieldnames)
 
 
+def _folder_picker_available() -> tuple[bool, Optional[str]]:
+    """Return whether a GUI folder picker can be shown on this system."""
+
+    if sys.platform == "darwin":
+        if shutil.which("osascript") is None:
+            return False, "Folder picker requires AppleScript (osascript) support on macOS"
+        return True, None
+
+    display = os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")
+    if os.name != "nt" and not display:
+        return False, "Folder picker is unavailable because no graphical display is configured"
+
+    try:
+        import tkinter as tk
+    except Exception as exc:
+        return False, f"Native folder picker is not available: {exc}"
+
+    try:
+        root = tk.Tk()
+        root.withdraw()
+        root.destroy()
+    except Exception as exc:  # pragma: no cover - depends on system GUI availability
+        return False, f"Native folder picker is not available: {exc}"
+
+    return True, None
+
+
 def _open_folder_dialog() -> str:
     """Show a native folder picker dialog and return the chosen path."""
+
+    available, reason = _folder_picker_available()
+    if not available:
+        raise RuntimeError(reason or "Native folder picker is not available on this system")
 
     if sys.platform == "darwin":
         result = _macos_folder_dialog()

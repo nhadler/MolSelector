@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import csv
+import importlib
 from pathlib import Path
 
 from fastapi.testclient import TestClient
 
 from molselector.app import RESULTS_FILENAME
+
+app_module = importlib.import_module("molselector.app")
 
 
 def _create_molecule_files(base: Path) -> None:
@@ -142,3 +145,27 @@ def test_molecule_request_rejects_path_traversal(
 
     assert response.status_code == 403
     assert "outside the selected folder" in response.json()["detail"]
+
+
+def test_folder_picker_availability_reports_unavailable(monkeypatch, client: TestClient) -> None:
+    """Expose picker availability without requiring a GUI in tests."""
+
+    monkeypatch.setattr(app_module, "_folder_picker_available", lambda: (False, "no gui"))
+
+    response = client.get("/api/folder/picker/availability")
+
+    assert response.status_code == 200
+    assert response.json() == {"available": False, "reason": "no gui"}
+
+
+def test_folder_picker_request_returns_service_unavailable_when_missing(
+    monkeypatch, client: TestClient
+) -> None:
+    """Gracefully fail the browse endpoint when no GUI is present."""
+
+    monkeypatch.setattr(app_module, "_folder_picker_available", lambda: (False, "no gui"))
+
+    response = client.get("/api/folder/picker")
+
+    assert response.status_code == 503
+    assert "no gui" in response.json()["detail"]

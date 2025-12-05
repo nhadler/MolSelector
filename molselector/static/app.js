@@ -15,6 +15,7 @@ const state = {
 };
 
 const defaultFolder = window.MOLSELECTOR_DEFAULT_FOLDER;
+const folderPicker = window.MOLSELECTOR_FOLDER_PICKER || { available: true, reason: '' };
 
 const folderForm = document.getElementById('folder-form');
 const folderInput = document.getElementById('folder-input');
@@ -80,6 +81,11 @@ async function loadFolder(folderPath) {
 }
 
 async function handleBrowse() {
+  if (!folderPicker.available) {
+    setManualEntryMessage(folderPicker.reason);
+    return;
+  }
+
   folderStatus.textContent = 'Opening folder picker…';
   try {
     const response = await fetch('/api/folder/picker');
@@ -91,9 +97,11 @@ async function handleBrowse() {
     folderInput.value = data.folder;
     await loadFolder(data.folder);
   } catch (error) {
-    folderStatus.textContent = error.message;
-    setControlsEnabled(false);
-    setBackEnabled(false);
+    setManualEntryMessage(error.message);
+    if (!state.folder) {
+      setControlsEnabled(false);
+      setBackEnabled(false);
+    }
   }
 }
 
@@ -338,6 +346,24 @@ function handleDeclinedToggle(event) {
   updateViewer();
 }
 
+function initBrowseSupport() {
+  if (!folderPicker.available) {
+    browseBtn.disabled = true;
+    browseBtn.classList.add('disabled');
+    setManualEntryMessage(folderPicker.reason);
+  }
+}
+
+function setManualEntryMessage(reason) {
+  const guidance = 'Folder picker is unavailable; enter a folder path manually and click Load Folder.';
+  if (!reason) {
+    folderStatus.textContent = guidance;
+    return;
+  }
+  const separator = reason.trim().endsWith('.') ? ' ' : '. ';
+  folderStatus.textContent = `${reason}${separator}${guidance}`;
+}
+
 folderForm.addEventListener('submit', handleSetFolder);
 acceptBtn.addEventListener('click', () => submitDecision('accept'));
 declineBtn.addEventListener('click', () => submitDecision('decline'));
@@ -354,6 +380,7 @@ window.addEventListener('resize', () => {
   }
 });
 
+initBrowseSupport();
 initViewer();
 updateFilterControls();
 
