@@ -54,9 +54,9 @@ async def index(request: Request) -> HTMLResponse:
     picker_available, picker_reason = _folder_picker_available()
 
     return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
+        request=request,
+        name="index.html",
+        context={
             "supported_extensions": ", ".join(sorted(SUPPORTED_EXTENSIONS)),
             "default_folder": _get_default_folder(),
             "folder_picker": {"available": picker_available, "reason": picker_reason},
